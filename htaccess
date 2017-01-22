@@ -1,0 +1,102 @@
+DOCUMENTATION HTACCESS HTPASSWD : https://httpd.apache.org/docs/2.2/howto/htaccess.html
+
+AuthUserFile /cheminAbsolue/.htpasswd //Chemin du fichier contenant les mots de passe. Qu'il est préférable de crypter avant.
+AuthName "Connexion à l'administration" //Message lors de la demande d'inscription
+AuthType Basic //indique qu'il faut utiliser AuthUserFile pour vérifier les mots de passe. ICI sa sera donc .htpasswd
+Require valid-user //Indique que seul les utilisateurs identifiés sont autorisés. Il est possible de mettre Require user nom_de_l_utilisateur si on veux restreindre un répertoire à une seule partie des personnes inscrites sur la liste des mots de passe.
+
+//Pour proteger l'acces à un seul fichier au lieu de tous le repertoire
+<Files test.php>
+	AuthUserFile /exemple/.htpasswd
+	AuthName "Accès restreint"
+	AuthType Basic
+	require valid-user
+</Files>
+
+Changer la redirection vers l'index
+DirectoryIndex index.php index.html /erreurs/erreur_403.php
+//Si index.php n'est pas trouvé envoie vers index.html si pas trouvé alors vers le fichier erreur 403.php
+
+AddType
+
+La fonction AddType a pour but, la plupart du temps, d'indiquer au navigateur comment interpréter un fichier dont l'extension est inconnue. 
+Par exemple pour un fichier ayant l'extension .dwg, le navigateur ne sait pas a quoi correspond le fichier.
+On peut donc écrire dans le fichier .htaccess :
+
+AddType application/acad dwg
+
+Le navigateur ouvrira donc le logiciel en association avec l'extension .dwg, en l'occurrence Autocad, si celui ci est installé sur l'ordinateur du client.
+
+Cette commande permet également de changer une action normalement prédéfinie.
+Par exemple, en entrant le code suivant dans le .htaccess :
+
+AddType image/jpeg .html
+
+Le navigateur interprètera le fichier html comme si c'était une image de type jpeg.
+
+ForceType
+
+Cette fonction agit un peu comme la fonction AddType sauf qu'elle agit sur tout les types de fichiers où est placé le .htaccess.
+
+Ainsi, si vous écrivez dans votre .htaccess :
+
+ForceType image/jpeg
+
+Tous les fichiers présents dans le répertoire du .htaccess seront considérés comme des fichiers jpeg et ce quel que soit leur type (.html, .php, .png...).
+
+DefaultType
+
+DefaultType est tout simplement destiné à définir l'action qui sera effectuée par le navigateur lorsque il rencontrera un fichier inconnu.
+Le code suivant aura par exemple pour effet d'interpréter n'importe quel fichier inconnu comme un fichier de type html.
+
+DefaultType text/html
+
+Système de maintenance
+
+Le principe du fichier est d'interdire au visiteur toutes les pages et de le rediriger vers une page de maintenance.
+
+Voici donc la structure du .htaccess :
+
+ErrorDocument 403 /maintenance.html 
+deny from all 
+allow from xx.xxx.xxx.xxx 
+<Files maintenance.html>
+allow from all
+</Files>
+
+Oué m'enfin là, je ne comprends pas grand-chose à ce qu'on a marqué. o_O
+Ne vous inquiétez pas, on va expliquer :p :
+
+ErrorDocument 403 /maintenance.html
+
+On définit le fichier d'erreur 403 (l'erreur 403 est l'erreur qui indique que l'accès est interdit) comme étant la page maintenance.html : le site va donc afficher cette dernière lorsque la page est "interdite" (à la place du message Error 403 Forbidden).
+
+deny from all
+
+Là, ce n'est pas compliqué : on interdit tout simplement l'accès à tout le répertoire dans lequel se trouve le .htaccess. :D
+
+allow from xx.xxx.xxx.xxx
+
+Bah, effectivement, si c'est interdit, le webmaster ne peut pas y accéder non plus, il faut donc autoriser l'IP ou les IP "xx.xxx.xxx.xxx".
+
+<Files maintenance.html>
+allow from all
+</Files>
+Et là on autorise à tout le monde le droit de voir le fichier maintenance.html.
+
+Voilà, je crois que c'est bon, il ne vous reste qu'à placer ce fichier à la racine de votre site lorsque vous voulez le mettre en maintenance.
+Après, vous pouvez le mettre dans un répertoire spécial pour ne fermer qu'une seule partie. ;)
+
+Pour personnalisé les erreurs (Page affiché en cas d'erreur):
+	ErrorDocument 401 /erreurs/erreur_401.php
+	ErrorDocument 403 /erreurs/erreur_403.php
+	ErrorDocument 404 /erreurs/erreur_404.php
+	ErrorDocument 500 /erreurs/erreur_500.php
+
+//Definition des erreurs 
+400:Bad Request: la syntaxe de la requête est mal formulée.
+401:Unhautorized: l'utilisateur n'a pas entré le bon mot de passe pour accéder au contenu.
+403:Forbidden: l'accès au contenu est interdit.
+404:Not Found: le document n'a pas été trouvé.
+500:Internal Server Error: le serveur a rencontré une erreur interne (erreur de script ou erreur passagère).
+503:Service Unvailable: le serveur ne peut pas répondre à cause d'une surcharge de trafic (trop de visiteurs).
