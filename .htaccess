@@ -9,4 +9,4 @@ Deny from all
 AuthType Basic
 AuthName "Access to /logs"
 AuthUserFile /kunden/homepages/43/d647852226/htpasswd
-Require user u86469772
+Require user METTRE USER
